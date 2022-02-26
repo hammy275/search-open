@@ -16,7 +16,7 @@ int get_priority(std::string query, std::string other) {
         return 0;
     }
     if (query.find(other) != std::string::npos || other.find(query) != std::string::npos) {
-        return -1;
+        return 1;
     }
     return 0;
 }
@@ -45,6 +45,10 @@ void do_search(std::string query, std::vector<Desktop*> entries, int search_type
 void search(std::string query, std::vector<Desktop*> entries) {
     // Make lowercase
     std::transform(query.begin(), query.end(), query.begin(), ::tolower);
+
+    for (int i = 0; i < result.size(); i++) {
+        result.pop();
+    }
 
     do_search(query, entries, SEARCH_NAME);
     do_search(query, entries, SEARCH_COMMENT);

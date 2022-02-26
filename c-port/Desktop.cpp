@@ -17,6 +17,9 @@ Desktop::Desktop(std::string file_path) {
         } else if (content.rfind("Comment=", 0) == 0) {
             // If line starts with Comment=
             this->comment = content.substr(8);
+        } else if (content.rfind("Icon=", 0) == 0) {
+            // If line starts with Icon=
+            this->icon = content.substr(5);
         }
     }
 

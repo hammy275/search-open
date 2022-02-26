@@ -9,6 +9,7 @@ class Desktop {
         std::string id;
         std::string name;
         std::string comment;
+        std::string icon;
         int is_valid = 0;
         int priority = 0;
         explicit Desktop(std::string file_path);
