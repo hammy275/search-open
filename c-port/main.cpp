@@ -30,7 +30,12 @@ void on_search_changed(GObject* object) {
             gtk_widget_show(GTK_WIDGET(result_images[i]));
 
             gtk_label_set_text(result_labels[i], entry->name.c_str());
-            //TODO: Set Icon
+            if (entry->icon_type == ICON_TYPE_FILE) {
+                gtk_image_set_from_pixbuf(result_images[i], 
+                    gdk_pixbuf_new_from_file_at_scale(entry->icon.c_str(), 48, 48, FALSE, NULL));
+            } else if (entry->icon_type == ICON_TYPE_NAME) {
+                gtk_image_set_from_icon_name(result_images[i], entry->icon.c_str(), GTK_ICON_SIZE_DIALOG);
+            }
         }
     }
 }

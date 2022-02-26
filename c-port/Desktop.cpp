@@ -23,11 +23,17 @@ Desktop::Desktop(std::string file_path) {
         }
     }
 
+    file.close();
+
     if (!this->name.empty() && !this->comment.empty()) {
         // Remove .desktop from end
         this->id = file_path.substr(0, file_path.size() - 8);
         // Remove rest of file path from beginning
         this->id = this->id.substr(this->id.find_last_of('/') + 1);
+        file.open(this->icon);
+        if (file) {
+            this->icon_type = ICON_TYPE_FILE;
+        }
         this->is_valid = 1;
     }
 }
