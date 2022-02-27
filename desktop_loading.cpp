@@ -74,7 +74,8 @@ void get_all_desktops() {
 }
 
 void clean_entries() {
-    for (int i = 0; i < all_desktops.size(); i++) {
+    int size = all_desktops.size();
+    for (int i = 0; i < size; i++) {
         delete all_desktops.at(i);
     }
 }
