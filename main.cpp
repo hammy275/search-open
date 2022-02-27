@@ -5,6 +5,7 @@
 
 #include "desktop_loading.h"
 #include "search.h"
+#include "ui.h"
 
 GtkBuilder *builder;
 GtkWindow *window;
@@ -115,7 +116,7 @@ void init_gui() {
     /**
      * Initializes the GUI
      */
-    builder = gtk_builder_new_from_file("view.glade");
+    builder = gtk_builder_new_from_string(get_ui().c_str(), -1);
 
     window = GTK_WINDOW(gtk_builder_get_object(builder, "main"));
     gtk_window_set_decorated(window, FALSE);

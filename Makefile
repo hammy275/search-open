@@ -4,7 +4,7 @@ LDFLAGS = `pkg-config --libs gtk+-3.0`
 
 all: build
 
-build:	main.o desktop_loading.o Desktop.o search.o
+build:	main.o desktop_loading.o Desktop.o search.o ui.o
 	$(C++) -g -o search-open $^ $(LDFLAGS)
 
 clean:
