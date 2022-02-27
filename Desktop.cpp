@@ -5,21 +5,27 @@
 #include "Desktop.h"
 
 Desktop::Desktop(std::string file_path) {
+    bool has_name = false;
+    bool has_comment = false;
+    bool has_icon = false;
     std::ifstream file;
     file.open(file_path);
 
     std::string content;
-    while (file.good()) {
+    while (file.good() && (!has_name || !has_comment || !has_icon)) {
         std::getline(file, content);
-        if (content.rfind("Name=", 0) == 0) {
+        if (!has_name && content.rfind("Name=", 0) == 0) {
             // If line starts with Name=
             this->name = content.substr(5);
-        } else if (content.rfind("Comment=", 0) == 0) {
+            has_name = true;
+        } else if (!has_comment && content.rfind("Comment=", 0) == 0) {
             // If line starts with Comment=
             this->comment = content.substr(8);
-        } else if (content.rfind("Icon=", 0) == 0) {
+            has_comment = true;
+        } else if (!has_icon && content.rfind("Icon=", 0) == 0) {
             // If line starts with Icon=
             this->icon = content.substr(5);
+            has_icon = true;
         }
     }
 
