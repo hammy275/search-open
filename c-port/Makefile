@@ -5,7 +5,7 @@ LDFLAGS = `pkg-config --libs gtk+-3.0`
 all: build
 
 build:	main.o desktop_loading.o Desktop.o search.o
-	$(C++) -o search-open $^ $(LDFLAGS)
+	$(C++) -g -o search-open $^ $(LDFLAGS)
 
 clean:
 	rm -f *.o
@@ -16,3 +16,6 @@ clean:
 
 run: clean build
 	./search-open
+
+valgrind: clean build
+	valgrind --leak-check=full ./search-open

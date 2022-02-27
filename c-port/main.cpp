@@ -12,8 +12,21 @@ GtkEntry *search_entry;
 GtkLabel *result_labels[5];
 GtkImage *result_images[5];
 
+void cleanup() {
+    clean_results();
+    clean_entries();
+}
+
+void clean_exit() {
+    cleanup();
+    gtk_main_quit();
+}
 
 void on_search_changed(GObject* object) {
+    /**
+     * Called when the search bar text is changed.
+     * Searches the .desktop entries, and sets the GUI based on the results
+     */
     std::string query = std::string(gtk_entry_get_text(search_entry));
     search(query, all_desktops);
     for (int i = 0; i < 5; i++) {
@@ -41,12 +54,15 @@ void on_search_changed(GObject* object) {
 }
 
 void init_gui() {
+    /**
+     * Initializes the GUI
+     */
     builder = gtk_builder_new_from_file("view.glade");
 
     window = GTK_WINDOW(gtk_builder_get_object(builder, "main"));
     gtk_window_set_decorated(window, FALSE);
-    g_signal_connect(G_OBJECT(window), "focus-out-event", G_CALLBACK(gtk_main_quit), NULL);
-    g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    g_signal_connect(G_OBJECT(window), "focus-out-event", G_CALLBACK(clean_exit), NULL);
+    g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(clean_exit), NULL);
 
     search_entry = GTK_ENTRY(gtk_builder_get_object(builder, "input"));
     g_signal_connect(G_OBJECT(search_entry), "changed", G_CALLBACK(on_search_changed), NULL);
@@ -74,9 +90,3 @@ int main(int argc, char** argv) {
 
     return 0;
 }
-
-/*
- * auto search_res = std::priority_queue<Desktop*, std::vector<Desktop*>, CompareDesktops>();
-    search("intellij", all_desktops);
- */
-

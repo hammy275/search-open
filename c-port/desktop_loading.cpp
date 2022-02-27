@@ -72,3 +72,9 @@ void get_all_desktops() {
         add_desktops_with_subdirs(desktop_folders_toplevel[i]);
     }
 }
+
+void clean_entries() {
+    for (int i = 0; i < all_desktops.size(); i++) {
+        delete all_desktops.at(i);
+    }
+}
