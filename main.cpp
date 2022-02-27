@@ -11,6 +11,10 @@ GtkWindow *window;
 GtkEntry *search_entry;
 GtkLabel *result_labels[5];
 GtkImage *result_images[5];
+Desktop *result_desktops[5];
+
+int selected_desktop = 0;
+int num_of_results = 0;
 
 void cleanup() {
     clean_results();
@@ -22,6 +26,19 @@ void clean_exit() {
     gtk_main_quit();
 }
 
+void update_selected() {
+    if (num_of_results > 0) {
+        for (int i = 0; i < num_of_results; i++) {
+            if (i == selected_desktop) {
+                std::string res = "<b>" + std::string(gtk_label_get_text(result_labels[i])) + "</b>";
+                gtk_label_set_markup(result_labels[i], res.c_str());
+            } else {
+                gtk_label_set_text(result_labels[i], gtk_label_get_text(result_labels[i]));
+            }
+        }
+    }
+}
+
 bool on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer data) {
     /**
      * Handle key presses.
@@ -29,6 +46,25 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer data) {
      */
     if (event->keyval == GDK_KEY_Escape) {
         clean_exit();
+        return TRUE;
+    } else if (num_of_results > 0 &&
+        (event->keyval == GDK_KEY_Return || event->keyval == GDK_KEY_KP_Enter)) {
+        execlp("gtk-launch", "gtk-launch", result_desktops[selected_desktop]->id.c_str(), NULL);
+        return TRUE;
+    } else if (event->keyval == GDK_KEY_downarrow || event->keyval == GDK_KEY_Down) {
+        if (++selected_desktop >= num_of_results) {
+            selected_desktop = 0;
+        }
+        update_selected();
+        return TRUE;
+    } else if (event->keyval == GDK_KEY_uparrow || event->keyval == GDK_KEY_Up) {
+        if (--selected_desktop < 0) {
+            selected_desktop = num_of_results - 1;
+            if (selected_desktop == -1) {
+                selected_desktop = 0;
+            }
+        }
+        update_selected();
         return TRUE;
     }
     return FALSE;
@@ -41,14 +77,17 @@ void on_search_changed(GObject* object) {
      */
     std::string query = std::string(gtk_entry_get_text(search_entry));
     search(query, all_desktops);
+    num_of_results = 0;
     for (int i = 0; i < 5; i++) {
         if (i >= result.size()) {
             // If there isn't a result to put here
             gtk_widget_hide(GTK_WIDGET(result_labels[i]));
             gtk_widget_hide(GTK_WIDGET(result_images[i]));
         } else {
+            num_of_results++;
             Desktop* entry = result.top();
             result.pop();
+            result_desktops[i] = entry;
 
             // If there IS a result to put here
             gtk_widget_show(GTK_WIDGET(result_labels[i]));
@@ -63,6 +102,13 @@ void on_search_changed(GObject* object) {
             }
         }
     }
+    if (selected_desktop >= num_of_results) {
+        selected_desktop = num_of_results - 1;
+        if (selected_desktop == -1) {
+            selected_desktop = 0;
+        }
+    }
+    update_selected();
 }
 
 void init_gui() {
@@ -75,10 +121,10 @@ void init_gui() {
     gtk_window_set_decorated(window, FALSE);
     g_signal_connect(G_OBJECT(window), "focus-out-event", G_CALLBACK(clean_exit), NULL);
     g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(clean_exit), NULL);
-    g_signal_connect(G_OBJECT(window), "key-press-event", G_CALLBACK(on_key_press), NULL);
 
     search_entry = GTK_ENTRY(gtk_builder_get_object(builder, "input"));
     g_signal_connect(G_OBJECT(search_entry), "changed", G_CALLBACK(on_search_changed), NULL);
+    g_signal_connect(G_OBJECT(search_entry), "key-press-event", G_CALLBACK(on_key_press), NULL);
 
     for (int i = 1; i < 6; i++) {
         std::string label_name = "result-text-" + std::to_string(i);
