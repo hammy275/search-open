@@ -22,6 +22,18 @@ void clean_exit() {
     gtk_main_quit();
 }
 
+bool on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer data) {
+    /**
+     * Handle key presses.
+     * Returns TRUE when the key press is handled.
+     */
+    if (event->keyval == GDK_KEY_Escape) {
+        clean_exit();
+        return TRUE;
+    }
+    return FALSE;
+}
+
 void on_search_changed(GObject* object) {
     /**
      * Called when the search bar text is changed.
@@ -63,6 +75,7 @@ void init_gui() {
     gtk_window_set_decorated(window, FALSE);
     g_signal_connect(G_OBJECT(window), "focus-out-event", G_CALLBACK(clean_exit), NULL);
     g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(clean_exit), NULL);
+    g_signal_connect(G_OBJECT(window), "key-press-event", G_CALLBACK(on_key_press), NULL);
 
     search_entry = GTK_ENTRY(gtk_builder_get_object(builder, "input"));
     g_signal_connect(G_OBJECT(search_entry), "changed", G_CALLBACK(on_search_changed), NULL);
