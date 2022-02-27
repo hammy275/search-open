@@ -44,7 +44,7 @@ void add_desktops_with_subdirs(std::string path) {
             struct stat s;
             if (stat(subpath.c_str(), &s) == 0) {
                 if (s.st_mode & S_IFDIR) {
-                    add_desktops_with_subdirs(subpath); // Add .desktop if we have a directory
+                    add_desktops_with_subdirs(subpath + "/"); // Add .desktop if we have a directory
                 } else if (s.st_mode & S_IFREG) {
                     // Add the .desktop if it's a .desktop file
                     Desktop *desktop = new Desktop(subpath);

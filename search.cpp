@@ -43,9 +43,7 @@ void do_search(std::string query, std::vector<Desktop*> entries, int search_type
 
 void clean_results() {
     for (int i = 0; i < result.size(); i++) {
-        Desktop* to_del = result.top();
         result.pop();
-        delete to_del;
     }
 }
 
@@ -53,6 +51,8 @@ void clean_results() {
 void search(std::string query, std::vector<Desktop*> entries) {
     // Make lowercase
     std::transform(query.begin(), query.end(), query.begin(), ::tolower);
+
+    clean_results();
 
     do_search(query, entries, SEARCH_NAME);
     do_search(query, entries, SEARCH_COMMENT);
