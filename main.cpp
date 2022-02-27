@@ -86,6 +86,10 @@ int main(int argc, char** argv) {
     init_gui();
     
     gtk_widget_show_all(GTK_WIDGET(window));
+    for (int i = 0; i < 5; i++) {
+        gtk_widget_hide(GTK_WIDGET(result_labels[i]));
+        gtk_widget_hide(GTK_WIDGET(result_images[i]));
+    }
     gtk_main();
 
     return 0;
