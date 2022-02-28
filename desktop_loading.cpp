@@ -4,15 +4,14 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <cstdlib>
 
 #include "desktop_loading.h"
 #include "Desktop.h"
 
-std::string desktop_folders_toplevel[3] = {"/usr/share/applications/", "/usr/local/share/applications/",
-                                           get_home_desktops_path().append(".local/share/applications/")};
 std::vector<Desktop*> all_desktops;
 
-std::string get_home_desktops_path() {
+std::string get_home_path() {
     /**
      * Gets ~/.local/share/applications/
      */
@@ -68,9 +67,21 @@ void get_all_desktops() {
      * Adds all .desktop files to all_desktops
      * Is not automatically called in this file!
      */
-    for (int i = 0; i < 3; i++) {
-        add_desktops_with_subdirs(desktop_folders_toplevel[i]);
+    std::string paths_str = std::getenv("XDG_DATA_DIRS");
+    std::vector<std::string> paths;
+    int left = 0;
+    int right = paths_str.find(":");
+    while (right != -1) {
+        paths.push_back(paths_str.substr(left, right - left) + "/applications/");
+        left = right + 1;
+        right = paths_str.find(":", left);
     }
+    paths.push_back(paths_str.substr(left, right - left) + "/applications/");
+    paths.push_back(get_home_path() + ".local/share/applications/");
+    for (int i = 0; i < paths.size(); i++) {
+        add_desktops_with_subdirs(paths.at(i));
+    }
+    
 }
 
 void clean_entries() {
