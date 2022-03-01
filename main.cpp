@@ -139,6 +139,9 @@ void init_gui() {
         result_labels[i-1] = GTK_LABEL(gtk_builder_get_object(builder, label_name.c_str()));
         result_images[i-1] = GTK_IMAGE(gtk_builder_get_object(builder, image_name.c_str()));
     }
+
+    gtk_window_set_default_size(window, 720, 288);
+    gtk_window_set_position(window, GTK_WIN_POS_CENTER_ALWAYS);
 }
 
 int main(int argc, char** argv) {
