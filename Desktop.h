@@ -9,7 +9,7 @@
 
 class Desktop {
     public:
-        std::string id;
+        std::string path;
         std::string name;
         std::string comment;
         std::string icon;
