@@ -9,6 +9,8 @@
 #include "search.h"
 #include "ui.h"
 
+std::string version = "1.0.0-beta";
+
 GtkBuilder *builder;
 GtkWindow *window;
 GtkEntry *search_entry;
@@ -145,6 +147,20 @@ void init_gui() {
     gtk_window_set_position(window, GTK_WIN_POS_CENTER_ALWAYS);
 }
 
+void handle_args(int argc, char** argv) {
+    if (argc >= 2) {
+        std::string arg1 = std::string(argv[1]);
+        if (arg1 == "-v" || arg1 == "--version") {
+            std::cout << version << std::endl;
+            exit(0);
+        } else {
+            std::cout << "Help:" << std::endl;
+            std::cout << "-h   --help\tPrints this help\n-v   --version\tGets the version of search-open" << std::endl;
+            exit(0);
+        }
+    }
+}
+
 int main(int argc, char** argv) {
     /**
      * Entrypoint
@@ -153,6 +169,8 @@ int main(int argc, char** argv) {
     get_all_desktops();
 
     gtk_init(&argc, &argv);
+    handle_args(argc, argv);
+
     init_gui();
     
     gtk_widget_show_all(GTK_WIDGET(window));
