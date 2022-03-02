@@ -23,25 +23,29 @@ int get_priority(std::string query, std::string other, int multiplier) {
     return 0;
 }
 
-void do_search(std::string query, std::vector<Desktop*> entries, int search_type) {
-    for (int i = 0; i < entries.size(); i++) {
+void do_search(std::string query, std::vector<Desktop*> *entries, int search_type) {
+    for (int i = 0; i < entries->size(); i++) {
         std::string to_check;
         int multiplier = search_type;
         if (search_type == SEARCH_NAME) {
-            to_check = entries.at(i)->name;
+            to_check = entries->at(i)->name;
         } else if (search_type == SEARCH_COMMENT) {
-            to_check = entries.at(i)->comment;
+            to_check = entries->at(i)->comment;
         } else if (search_type == SEARCH_KEYWORDS) {
             // Although keywords is technically a ;-separated list, treating it as a giant string works plenty well
-            to_check = entries.at(i)->keywords;
+            to_check = entries->at(i)->keywords;
         } else {
             std::cout << "Invalid search type specified!" << std::endl;
             return;
         }
         std::transform(to_check.begin(), to_check.end(), to_check.begin(), ::tolower);
-        entries.at(i)->priority = get_priority(query, to_check, multiplier);
-        if (entries.at(i)->priority != 0) {
-            result.push(entries.at(i));
+        entries->at(i)->priority = get_priority(query, to_check, multiplier);
+        if (entries->at(i)->priority != 0) {
+            result.push(entries->at(i));
+            // Remove an already-found desktop so we don't search for it again
+            entries->erase(entries->begin() + i);
+            // i-- to counteract so when the i++ of the for-loop runs, we don't skip a .desktop
+            i--;
         }
     }
 
@@ -61,8 +65,9 @@ void search(std::string query, std::vector<Desktop*> entries) {
 
     clean_results();
 
-    // Do searches from least to most impact
-    do_search(query, entries, SEARCH_COMMENT);
-    do_search(query, entries, SEARCH_KEYWORDS);
-    do_search(query, entries, SEARCH_NAME);
+    // Do searches from most to least important
+    std::vector<Desktop*> copy = entries;  // Make a copy since entries are delete to prevent dupes
+    do_search(query, &copy, SEARCH_NAME);
+    do_search(query, &copy, SEARCH_KEYWORDS);
+    do_search(query, &copy, SEARCH_COMMENT);
 }
