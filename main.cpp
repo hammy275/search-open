@@ -85,8 +85,9 @@ void on_search_changed(GObject* object) {
     std::string query = std::string(gtk_entry_get_text(search_entry));
     search(query, all_desktops);
     num_of_results = 0;
+    int raw_num_of_results = result.size();
     for (int i = 0; i < 5; i++) {
-        if (i >= result.size()) {
+        if (i >= raw_num_of_results) {
             // If there isn't a result to put here
             gtk_widget_hide(GTK_WIDGET(result_labels[i]));
             gtk_widget_hide(GTK_WIDGET(result_images[i]));

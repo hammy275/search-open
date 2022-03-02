@@ -13,6 +13,7 @@ class Desktop {
         std::string name;
         std::string comment;
         std::string icon;
+        std::string keywords = "";
         int icon_type = ICON_TYPE_NAME;
         int is_valid = 0;
         int priority = 0;

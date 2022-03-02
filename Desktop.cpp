@@ -8,11 +8,12 @@ Desktop::Desktop(std::string file_path) {
     bool has_name = false;
     bool has_comment = false;
     bool has_icon = false;
+    bool has_keywords = false;
     std::ifstream file;
     file.open(file_path);
 
     std::string content;
-    while (file.good() && (!has_name || !has_comment || !has_icon)) {
+    while (file.good() && (!has_name || !has_comment || !has_icon || !has_keywords)) {
         std::getline(file, content);
         if (!has_name && content.rfind("Name=", 0) == 0) {
             // If line starts with Name=
@@ -26,6 +27,8 @@ Desktop::Desktop(std::string file_path) {
             // If line starts with Icon=
             this->icon = content.substr(5);
             has_icon = true;
+        } else if (!has_keywords && content.rfind("Keywords=", 0) == 0) {
+            this->keywords = content.substr(9);
         }
     }
 
