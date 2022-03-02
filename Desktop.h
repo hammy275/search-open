@@ -14,10 +14,12 @@ class Desktop {
         std::string comment;
         std::string icon;
         std::string keywords = "";
+        std::string exec;
         int icon_type = ICON_TYPE_NAME;
         int is_valid = 0;
         int priority = 0;
         explicit Desktop(std::string file_path);
+        bool exec_to_launch = false;
 };
 
 struct CompareDesktops {

@@ -54,11 +54,15 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer data) {
         return TRUE;
     } else if (num_of_results > 0 &&
         (event->keyval == GDK_KEY_Return || event->keyval == GDK_KEY_KP_Enter)) {
-        GKeyFile* desktop_file = g_key_file_new();
-        g_key_file_load_from_file(desktop_file, result_desktops[selected_desktop]->path.c_str(), G_KEY_FILE_NONE, NULL);
-        GDesktopAppInfo* desktop_info = g_desktop_app_info_new_from_keyfile(desktop_file);
-        g_app_info_launch(G_APP_INFO(desktop_info), NULL, NULL, NULL);
-        clean_exit();
+        if (result_desktops[selected_desktop]->exec_to_launch) {
+            system(result_desktops[selected_desktop]->exec.c_str());
+        } else {
+            GKeyFile* desktop_file = g_key_file_new();
+            g_key_file_load_from_file(desktop_file, result_desktops[selected_desktop]->path.c_str(), G_KEY_FILE_NONE, NULL);
+            GDesktopAppInfo* desktop_info = g_desktop_app_info_new_from_keyfile(desktop_file);
+            g_app_info_launch(G_APP_INFO(desktop_info), NULL, NULL, NULL);
+            clean_exit();
+        }
         return TRUE;
     } else if (event->keyval == GDK_KEY_downarrow || event->keyval == GDK_KEY_Down) {
         if (++selected_desktop >= num_of_results) {

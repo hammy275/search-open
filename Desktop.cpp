@@ -10,11 +10,12 @@ Desktop::Desktop(std::string file_path) {
     bool has_icon = false;
     bool has_keywords = false;
     bool has_no_display = false;
+    bool has_exec = false;
     std::ifstream file;
     file.open(file_path);
 
     std::string content;
-    while (file.good() && (!has_name || !has_comment || !has_icon || !has_keywords
+    while (file.good() && (!has_name || !has_comment || !has_icon || !has_keywords || !has_exec
         || !has_no_display)) {
         std::getline(file, content);
         if (!has_name && content.rfind("Name=", 0) == 0) {
@@ -36,12 +37,18 @@ Desktop::Desktop(std::string file_path) {
                 file.close();
                 return;
             }
-        }
+        } else if (!has_icon && content.rfind("Exec=", 0) == 0) {
+            this->exec = content.substr(5);
+            if (this->exec.rfind("pkexec", 0) == 0) {
+                this->exec_to_launch = true;
+            }
+            has_exec = true;
+        } 
     }
 
     file.close();
 
-    if (!this->name.empty() && !this->comment.empty()) {
+    if (has_name && has_comment && has_exec) {
         // Remove .desktop from end
         this->path = file_path;
         file.open(this->icon);
