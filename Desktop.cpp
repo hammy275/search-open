@@ -32,12 +32,14 @@ Desktop::Desktop(std::string file_path) {
             has_icon = true;
         } else if (!has_keywords && content.rfind("Keywords=", 0) == 0) {
             this->keywords = content.substr(9);
-        } else if (!has_keywords && content.rfind("NoDisplay=", 0) == 0) {
+            has_keywords = true;
+        } else if (!has_no_display && content.rfind("NoDisplay=", 0) == 0) {
             if (content.substr(10).find("true") != std::string::npos) {
                 file.close();
                 return;
             }
-        } else if (!has_icon && content.rfind("Exec=", 0) == 0) {
+            has_no_display = true;
+        } else if (!has_exec && content.rfind("Exec=", 0) == 0) {
             this->exec = content.substr(5);
             if (this->exec.rfind("pkexec", 0) == 0) {
                 this->exec_to_launch = true;
