@@ -6,7 +6,7 @@ A small utility that acts as a quick search on your system.
 
 ## Why?
 
-For a couple reasons:c
+For a couple reasons:
 
 - It makes for an excellent project for me to learn GTK and apply C++
 - I rely heavily on an easily accessible menu with a search bar, and having a dead simple program that does so is really nice for me
