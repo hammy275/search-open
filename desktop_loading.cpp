@@ -10,6 +10,7 @@
 #include "Desktop.h"
 
 std::vector<Desktop*> all_desktops;
+std::mutex desktop_lock;
 
 std::string get_home_path() {
     /**
@@ -81,6 +82,7 @@ void get_all_desktops() {
     for (int i = 0; i < paths.size(); i++) {
         add_desktops_with_subdirs(paths.at(i));
     }
+    desktop_lock.unlock();
     
 }
 

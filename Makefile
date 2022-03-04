@@ -1,6 +1,6 @@
 C++ = g++
 CFLAGS = -c -g `pkg-config --cflags gtk+-3.0`
-LDFLAGS = `pkg-config --libs gtk+-3.0`
+LDFLAGS = `pkg-config --libs gtk+-3.0` -l pthread
 
 all: build
 

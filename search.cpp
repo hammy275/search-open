@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "search.h"
+#include "desktop_loading.h"
 
 // The below define the types of searches and the multiplier said search should have
 #define SEARCH_NAME 4
@@ -69,7 +70,9 @@ void search(std::string query, std::vector<Desktop*> entries) {
     clean_results();
 
     // Do searches from most to least important
+    desktop_lock.lock();
     std::vector<Desktop*> copy = entries;  // Make a copy since entries are delete to prevent dupes
+    desktop_lock.unlock();
     do_search(query, &copy, SEARCH_NAME);
     do_search(query, &copy, SEARCH_KEYWORDS);
     do_search(query, &copy, SEARCH_EXEC);
