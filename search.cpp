@@ -7,8 +7,9 @@
 #include "search.h"
 
 // The below define the types of searches and the multiplier said search should have
-#define SEARCH_NAME 3
-#define SEARCH_KEYWORDS 2
+#define SEARCH_NAME 4
+#define SEARCH_KEYWORDS 3
+#define SEARCH_EXEC 2
 #define SEARCH_COMMENT 1
 
 std::priority_queue<Desktop*, std::vector<Desktop*>, CompareDesktops> result;
@@ -34,6 +35,8 @@ void do_search(std::string query, std::vector<Desktop*> *entries, int search_typ
         } else if (search_type == SEARCH_KEYWORDS) {
             // Although keywords is technically a ;-separated list, treating it as a giant string works plenty well
             to_check = entries->at(i)->keywords;
+        } else if (search_type == SEARCH_EXEC) {
+            to_check = entries->at(i)->exec;
         } else {
             std::cout << "Invalid search type specified!" << std::endl;
             return;
@@ -69,5 +72,6 @@ void search(std::string query, std::vector<Desktop*> entries) {
     std::vector<Desktop*> copy = entries;  // Make a copy since entries are delete to prevent dupes
     do_search(query, &copy, SEARCH_NAME);
     do_search(query, &copy, SEARCH_KEYWORDS);
+    do_search(query, &copy, SEARCH_EXEC);
     do_search(query, &copy, SEARCH_COMMENT);
 }
