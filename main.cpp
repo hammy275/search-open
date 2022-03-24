@@ -185,7 +185,6 @@ int main(int argc, char** argv) {
         gtk_widget_hide(GTK_WIDGET(result_images[i]));
     }
     gtk_main();
-    desktop_loading.join();
 
     return 0;
 }
