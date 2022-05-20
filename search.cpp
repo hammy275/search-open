@@ -15,12 +15,59 @@
 
 std::priority_queue<Desktop*, std::vector<Desktop*>, CompareDesktops> result;
 
-int get_priority(std::string query, std::string other, int multiplier) {
+float get_priority(std::string query, std::string other, int multiplier) {
     if (query.empty() || other.empty()) {
         return 0;
     }
-    if (query.find(other) != std::string::npos || other.find(query) != std::string::npos) {
-        return 1 * multiplier;
+
+    if (query.compare(other) == 0) {
+        return 1024 * multiplier; // Strings are equal, give an absurdly large value
+    }
+
+    if (other.find(query) != std::string::npos) {
+        return multiplier * 2.0 * query.length(); // We find "query" inside "other"
+    }
+
+    // This block of code sees how many characters match between both strings with some leeway on the index
+    int matching_chars = 0;
+
+    std::string smaller;
+    std::string larger;
+    if (query.length() < other.length()) {
+        smaller = query;
+        larger = other;
+    } else {
+        smaller = other;
+        larger = query;
+    }
+
+    for (int c = 0; c < smaller.length(); c++) {
+        for (int i = -3; i <= 3; i++) {
+            int index = c + i;
+            if (index < 0) {
+                index = 0;
+            } else if (index >= smaller.length()) {
+                index = smaller.length() - 1;
+            }
+
+            if (index >= larger.length()) {
+                break;
+            }
+
+            if (smaller.at(index) == larger.at(c)) {
+                matching_chars++;
+                break;
+            }
+        }
+    }
+
+    if (matching_chars > smaller.length() / 1.5) {
+        return matching_chars * multiplier; // Characters found, but half in comparison to finding the full query inside
+    }
+
+
+    if (query.find(other) != std::string::npos) {
+        return multiplier * 0.1;
     }
     return 0;
 }
