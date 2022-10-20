@@ -173,6 +173,7 @@ int main(int argc, char** argv) {
     
     desktop_lock.lock();
     std::thread desktop_loading(get_all_desktops);
+    desktop_loading.detach();
 
     gtk_init(&argc, &argv);
     handle_args(argc, argv);
