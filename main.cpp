@@ -19,6 +19,8 @@ GtkLabel *result_labels[5];
 GtkImage *result_images[5];
 Desktop *result_desktops[5];
 
+int LABEL_HALF_HEIGHT = -1;
+
 int selected_desktop = 0;
 int num_of_results = 0;
 
@@ -30,6 +32,18 @@ void cleanup() {
 void clean_exit() {
     cleanup();
     gtk_main_quit();
+}
+
+void do_launch() {
+    if (result_desktops[selected_desktop]->exec_to_launch) {
+        system(result_desktops[selected_desktop]->exec.c_str());
+    } else {
+        GKeyFile* desktop_file = g_key_file_new();
+        g_key_file_load_from_file(desktop_file, result_desktops[selected_desktop]->path.c_str(), G_KEY_FILE_NONE, NULL);
+        GDesktopAppInfo* desktop_info = g_desktop_app_info_new_from_keyfile(desktop_file);
+        g_app_info_launch(G_APP_INFO(desktop_info), NULL, NULL, NULL);
+        clean_exit();
+    }
 }
 
 void update_selected() {
@@ -45,6 +59,35 @@ void update_selected() {
     }
 }
 
+bool on_mouse_move(GtkWidget* window, GdkEventMotion* event) {
+    gint x, y;
+    if (LABEL_HALF_HEIGHT == -1 && num_of_results >= 1) {
+        GtkAllocation alloc;
+        gtk_widget_get_allocation(GTK_WIDGET(result_labels[0]), &alloc);
+        LABEL_HALF_HEIGHT = alloc.height / 2;
+    } else if (num_of_results < 1) {
+        return FALSE;
+    }
+    gtk_widget_translate_coordinates(GTK_WIDGET(search_entry), GTK_WIDGET(window), 0, 0, &x, &y);
+    int minDiff = abs(y + LABEL_HALF_HEIGHT - event->y);
+    int selected = -1;
+    for (int i = 0; i < 5; i++) {
+        if (i < num_of_results) {
+            gtk_widget_translate_coordinates(GTK_WIDGET(result_labels[i]), GTK_WIDGET(window), 0, 0, &x, &y);
+            int diff = abs(y + LABEL_HALF_HEIGHT - event->y);
+            if (diff < minDiff) {
+                minDiff = diff;
+                selected = i;
+            }
+        }
+    }
+    if (selected != selected_desktop && selected >= 0) {
+        selected_desktop = selected;
+        update_selected();
+    }
+    return TRUE;
+}
+
 bool on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer data) {
     /**
      * Handle key presses.
@@ -55,15 +98,7 @@ bool on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer data) {
         return TRUE;
     } else if (num_of_results > 0 &&
         (event->keyval == GDK_KEY_Return || event->keyval == GDK_KEY_KP_Enter)) {
-        if (result_desktops[selected_desktop]->exec_to_launch) {
-            system(result_desktops[selected_desktop]->exec.c_str());
-        } else {
-            GKeyFile* desktop_file = g_key_file_new();
-            g_key_file_load_from_file(desktop_file, result_desktops[selected_desktop]->path.c_str(), G_KEY_FILE_NONE, NULL);
-            GDesktopAppInfo* desktop_info = g_desktop_app_info_new_from_keyfile(desktop_file);
-            g_app_info_launch(G_APP_INFO(desktop_info), NULL, NULL, NULL);
-            clean_exit();
-        }
+        do_launch();
         return TRUE;
     } else if (event->keyval == GDK_KEY_downarrow || event->keyval == GDK_KEY_Down) {
         if (++selected_desktop >= num_of_results) {
@@ -126,6 +161,11 @@ void on_search_changed(GObject* object) {
     update_selected();
 }
 
+bool on_mouse_click(GtkWidget *widget, GdkEventButton button, gpointer user_data) {
+    do_launch();
+    return TRUE;
+}
+
 void init_gui() {
     /**
      * Initializes the GUI
@@ -134,8 +174,11 @@ void init_gui() {
 
     window = GTK_WINDOW(gtk_builder_get_object(builder, "main"));
     gtk_window_set_decorated(window, FALSE);
+    gtk_widget_set_events(GTK_WIDGET(window), GDK_POINTER_MOTION_MASK);
     g_signal_connect(G_OBJECT(window), "focus-out-event", G_CALLBACK(clean_exit), NULL);
     g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(clean_exit), NULL);
+    g_signal_connect(G_OBJECT(window), "motion-notify-event", G_CALLBACK(on_mouse_move), NULL);
+    g_signal_connect(G_OBJECT(window), "button-press-event", G_CALLBACK(on_mouse_click), NULL);
 
     search_entry = GTK_ENTRY(gtk_builder_get_object(builder, "input"));
     g_signal_connect(G_OBJECT(search_entry), "changed", G_CALLBACK(on_search_changed), NULL);
