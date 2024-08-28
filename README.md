@@ -4,6 +4,10 @@ A small utility that acts as a quick search on your system.
 
 ![search-open Preview](/Screenshot.png)
 
+## Archival
+
+This project is now archived! I no longer use this project, nor wish to maintain it. It was mostly a learning experience in GTK3, while also letting me apply C++ knowledge to something I actually use.
+
 ## Why?
 
 For a couple reasons:
